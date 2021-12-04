@@ -316,7 +316,7 @@ def branch_net(input_shape, name_idx, dropout=0.5):
     regressor.add(Dropout(dropout))
     regressor.add(Dense(2048, activation='relu'))
     regressor.add(Dropout(dropout))
-    regressor.add(Dense(166, activation='softmax'))
+    regressor.add(Dense(1, activation='linear'))
 
     conv1 = conv_block(input1)
     atten1 = wv_block(input2)
@@ -336,9 +336,9 @@ def branch_net(input_shape, name_idx, dropout=0.5):
         np.arange(51.1, 79.9, 0.6)
     ]).reshape(-1, 1), dtype='float')
 
-    out1 = keras.backend.dot(prob1, vector)
+#    out1 = keras.backend.dot(prob1, vector)
 
-    return input1, input2, out1
+    return input1, input2, prob1
 
 def custom_loss(y_true, y_pred):
     y_c, y_p = y_pred[0], y_pred[1]
@@ -354,7 +354,7 @@ def siamese_net(input_shape, dropout):
     out = Add()([out1, out2]) / 2
     model = Model(inputs=[input1, input2, input3, input4], outputs=[out])
     model.summary()
-    model.compile(loss=['mse'], optimizer=keras.optimizers.RMSprop(learning_rate=0.0001), metrics=['mae'])
+    model.compile(loss=['mse'], optimizer=keras.optimizers.Adam(learning_rate=0.0001), metrics=['mse'])
 
     return model
 # model = siamese_net((60, 60, 1))
